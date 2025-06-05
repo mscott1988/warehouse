@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Robert Madden 454B (COD) Equipment</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background: #f5f5f5;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    header img {
+      height: 70px;
+    }
+    header h1 {
+      font-size: 22px;
+      color: #333;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    #preview-container {
+      margin-top: 30px;
+      background: #fff;
+      padding: 20px;
+      border: 1px solid #ccc;
+    }
+    #pdf-preview {
+      width: 100%;
+      height: 400px;
+      border: 1px solid #aaa;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #384036;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="Logo(whiteType)_EFR (1).png" alt="Cowboys AC Logo">
+    <h1>Robert Madden 454B (COD) Equipment</h1>
+  </header>
+
+  <label for="pdfUpload">Upload Housecall Pro Invoice (PDF):</label>
+  <input type="file" id="pdfUpload" accept="application/pdf">
+
+  <div id="preview-container">
+    <embed id="pdf-preview" type="application/pdf">
+  </div>
+
+  <label>Model #1:</label>
+  <input type="text" id="model1">
+  <label>Serial #1:</label>
+  <input type="text" id="serial1">
+
+  <label>Model #2:</label>
+  <input type="text" id="model2">
+  <label>Serial #2:</label>
+  <input type="text" id="serial2">
+
+  <label>Model #3:</label>
+  <input type="text" id="model3">
+  <label>Serial #3:</label>
+  <input type="text" id="serial3">
+
+  <button onclick="generateModifiedPDF()">Generate Completed PDF</button>
+
+  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+  <script>
+    let uploadedPdfBytes;
+
+    document.getElementById('pdfUpload').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file && file.type === 'application/pdf') {
+        const reader = new FileReader();
+        reader.onload = function() {
+          uploadedPdfBytes = reader.result;
+          document.getElementById('pdf-preview').src = URL.createObjectURL(file);
+        };
+        reader.readAsArrayBuffer(file);
+      }
+    });
+
+    async function generateModifiedPDF() {
+      if (!uploadedPdfBytes) {
+        alert("Please upload a PDF invoice first.");
+        return;
+      }
+
+      const model1 = document.getElementById('model1').value;
+      const serial1 = document.getElementById('serial1').value;
+      const model2 = document.getElementById('model2').value;
+      const serial2 = document.getElementById('serial2').value;
+      const model3 = document.getElementById('model3').value;
+      const serial3 = document.getElementById('serial3').value;
+
+      const pdfDoc = await PDFLib.PDFDocument.load(uploadedPdfBytes);
+      const pages = pdfDoc.getPages();
+      // Keep only the first page
+      const totalPages = pdfDoc.getPageCount();
+      for (let i = totalPages - 1; i > 0; i--) {
+        pdfDoc.removePage(i);
+      }
+
+      const firstPage = pages[0];
+
+      const font = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+      // Overlay white rectangle to hide bottom content
+      firstPage.drawRectangle({
+        x: 0,
+        y: 0,
+        width: 600,
+        height: 490,
+        color: PDFLib.rgb(1, 1, 1)
+      });
+
+      const writeText = (text, x, y) => {
+        if (text && text.trim() !== '') {
+          firstPage.drawText(text, { x, y, size: 8, font });
+        }
+      };
+
+      writeText(`Model #: ${model1}`, 40, 540);
+      writeText(`Serial #1: ${serial1}`, 40, 525);
+      writeText(`Model #: ${model2}`, 40, 510);
+      writeText(`Serial #2: ${serial2}`, 40, 495);
+      writeText(`Model #: ${model3}`, 40, 480);
+      writeText(`Serial #3: ${serial3}`, 40, 465);
+
+      firstPage.drawText("© 2025 Cowboys Air Conditioning & Heating", {
+        x: 40,
+        y: 25,
+        size: 7,
+        font,
+        color: PDFLib.rgb(0, 0, 0)
+      });
+      firstPage.drawText("Built by CowboysAC.com for authorized customer use only. Distribution without permission is not allowed.", {
+        x: 40,
+        y: 12,
+        size: 7,
+        font,
+        color: PDFLib.rgb(0, 0, 0)
+      });
+
+      const pdfBytes = await pdfDoc.save();
+      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = "Completed_Invoice.pdf";
+      link.click();
+    }
+  </script>
+
+</body>
+</html>
