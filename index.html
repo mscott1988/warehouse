@@ -1,175 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="icon" type="image/png" href="favicon.png">
+
+<link rel="apple-touch-icon" href="favicon.png">
+
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Warranty Form">
   <meta charset="UTF-8">
-  <title>Robert Madden 454B (COD) Equipment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cowboys AC Warranty Form</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 40px;
-      background: #f5f5f5;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
     }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    header img {
-      height: 70px;
-    }
-    header h1 {
-      font-size: 22px;
-      color: #333;
+    h2 {
+      text-align: center;
     }
     label {
       display: block;
       margin-top: 10px;
-      font-weight: bold;
     }
-    input[type="text"] {
+    input, textarea {
       width: 100%;
       padding: 8px;
       margin-top: 5px;
-      box-sizing: border-box;
-    }
-    #preview-container {
-      margin-top: 30px;
-      background: #fff;
-      padding: 20px;
       border: 1px solid #ccc;
-    }
-    #pdf-preview {
-      width: 100%;
-      height: 400px;
-      border: 1px solid #aaa;
+      border-radius: 4px;
     }
     button {
       margin-top: 20px;
-      padding: 10px 20px;
-      background-color: #384036;
+      width: 100%;
+      padding: 12px;
+      background: #0B1F3A;
       color: white;
       border: none;
-      cursor: pointer;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    img.logo {
+      display: block;
+      margin: auto;
+      max-width: 200px;
     }
   </style>
 </head>
 <body>
-
-  <header>
-    <img src="Logo(whiteType)_EFR (1).png" alt="Cowboys AC Logo">
-    <h1>Robert Madden 454B (COD) Equipment</h1>
-  </header>
-
-  <label for="pdfUpload">Upload Housecall Pro Invoice (PDF):</label>
-  <input type="file" id="pdfUpload" accept="application/pdf">
-
-  <div id="preview-container">
-    <embed id="pdf-preview" type="application/pdf">
+  <div class="container">
+    <img src="https://cowboysac.com/wp-content/uploads/2025/06/color-logo-scaled-2-1.webp" alt="Cowboys AC Logo" class="logo">
+    <h2>Warranty Submission Form</h2>
+    <form id="warrantyForm">
+      <label>Employee Name <input type="text" name="employee"></label>
+      <label>Install Date <input type="date" name="installDate"></label>
+      <label>Job # <input type="text" name="jobNumber"></label>
+      <label>Customer Name <input type="text" name="customerName"></label>
+      <label>Customer Address <input type="text" name="customerAddress"></label>
+      <label>Model # <input type="text" name="model"></label>
+      <label>Serial # <input type="text" name="serial"></label>
+      <label>Brand <input type="text" name="brand"></label>
+      <label>Reason <textarea name="reason"></textarea></label>
+      <button type="button" onclick="generatePDF()">Submit & Generate PDF</button>
+    </form>
   </div>
 
-  <label>Model #1:</label>
-  <input type="text" id="model1">
-  <label>Serial #1:</label>
-  <input type="text" id="serial1">
-
-  <label>Model #2:</label>
-  <input type="text" id="model2">
-  <label>Serial #2:</label>
-  <input type="text" id="serial2">
-
-  <label>Model #3:</label>
-  <input type="text" id="model3">
-  <label>Serial #3:</label>
-  <input type="text" id="serial3">
-
-  <button onclick="generateModifiedPDF()">Generate Completed PDF</button>
-
-  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
   <script>
-    let uploadedPdfBytes;
+    async function generatePDF() {
+      const { jsPDF } = window.jspdf;
+      const form = document.forms['warrantyForm'];
 
-    document.getElementById('pdfUpload').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file && file.type === 'application/pdf') {
-        const reader = new FileReader();
-        reader.onload = function() {
-          uploadedPdfBytes = reader.result;
-          document.getElementById('pdf-preview').src = URL.createObjectURL(file);
-        };
-        reader.readAsArrayBuffer(file);
-      }
-    });
+      const doc = new jsPDF();
+      const logo = new Image();
+      logo.crossOrigin = "anonymous";
+      logo.src = 'https://cowboysac.com/wp-content/uploads/2025/06/color-logo-scaled-2-1.webp';
 
-    async function generateModifiedPDF() {
-      if (!uploadedPdfBytes) {
-        alert("Please upload a PDF invoice first.");
-        return;
-      }
+      logo.onload = () => {
+        doc.addImage(logo, 'WEBP', 15, 10, 50, 20);
+        doc.setFontSize(16);
+        doc.text("Warranty Submission Form", 70, 25);
+        doc.setFontSize(12);
 
-      const model1 = document.getElementById('model1').value;
-      const serial1 = document.getElementById('serial1').value;
-      const model2 = document.getElementById('model2').value;
-      const serial2 = document.getElementById('serial2').value;
-      const model3 = document.getElementById('model3').value;
-      const serial3 = document.getElementById('serial3').value;
+        const entries = [
+          ['Employee Name', form.employee.value],
+          ['Install Date', form.installDate.value],
+          ['Job #', form.jobNumber.value],
+          ['Customer Name', form.customerName.value],
+          ['Customer Address', form.customerAddress.value],
+          ['Model #', form.model.value],
+          ['Serial #', form.serial.value],
+          ['Brand', form.brand.value],
+          ['Reason', form.reason.value],
+        ];
 
-      const pdfDoc = await PDFLib.PDFDocument.load(uploadedPdfBytes);
-      const pages = pdfDoc.getPages();
-      // Keep only the first page
-      const totalPages = pdfDoc.getPageCount();
-      for (let i = totalPages - 1; i > 0; i--) {
-        pdfDoc.removePage(i);
-      }
+        let y = 40;
+        entries.forEach(([label, value]) => {
+          doc.text(`${label}:`, 15, y);
+          doc.text(value || '-', 60, y);
+          y += 10;
+        });
 
-      const firstPage = pages[0];
+        doc.setFontSize(10);
+        doc.text("\u00A9 2025 Cowboys AC – Property of CowboysAC.com. Confidential – Intended solely for the recipient.", 15, 280);
 
-      const font = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
-      // Overlay white rectangle to hide bottom content
-      firstPage.drawRectangle({
-        x: 0,
-        y: 0,
-        width: 600,
-        height: 490,
-        color: PDFLib.rgb(1, 1, 1)
-      });
+        doc.save(`Warranty-${form.jobNumber.value || 'Form'}.pdf`);
 
-      const writeText = (text, x, y) => {
-        if (text && text.trim() !== '') {
-          firstPage.drawText(text, { x, y, size: 8, font });
-        }
+        alert("PDF generated. Please email it manually to warehouse@cowboysac.com or set up auto-email script.");
       };
-
-      writeText(`Model #: ${model1}`, 40, 540);
-      writeText(`Serial #1: ${serial1}`, 40, 525);
-      writeText(`Model #: ${model2}`, 40, 510);
-      writeText(`Serial #2: ${serial2}`, 40, 495);
-      writeText(`Model #: ${model3}`, 40, 480);
-      writeText(`Serial #3: ${serial3}`, 40, 465);
-
-      firstPage.drawText("© 2025 Cowboys Air Conditioning & Heating", {
-        x: 40,
-        y: 25,
-        size: 7,
-        font,
-        color: PDFLib.rgb(0, 0, 0)
-      });
-      firstPage.drawText("Built by CowboysAC.com for authorized customer use only. Distribution without permission is not allowed.", {
-        x: 40,
-        y: 12,
-        size: 7,
-        font,
-        color: PDFLib.rgb(0, 0, 0)
-      });
-
-      const pdfBytes = await pdfDoc.save();
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = "Completed_Invoice.pdf";
-      link.click();
     }
   </script>
-
 </body>
 </html>
