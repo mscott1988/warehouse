@@ -1,124 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="icon" type="image/png" href="favicon.png">
-
-<link rel="apple-touch-icon" href="favicon.png">
-
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Warranty Form">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cowboys AC Warranty Form</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f4f4;
+      background-color: #f6f6f6;
       margin: 0;
       padding: 20px;
     }
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background: white;
+    .form-container {
+      background: #fff;
       padding: 20px;
       border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 800px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
-    h2 {
+    .form-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .form-header img {
+      height: 60px;
+    }
+    h1 {
+      font-size: 20px;
       text-align: center;
+      margin-bottom: 20px;
     }
     label {
+      font-weight: bold;
       display: block;
-      margin-top: 10px;
+      margin-top: 15px;
     }
-    input, textarea {
+    input, textarea, select {
       width: 100%;
       padding: 8px;
       margin-top: 5px;
       border: 1px solid #ccc;
       border-radius: 4px;
+      box-sizing: border-box;
     }
     button {
       margin-top: 20px;
-      width: 100%;
+      background-color: #E63946;
+      color: #fff;
       padding: 12px;
-      background: #0B1F3A;
-      color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 4px;
+      cursor: pointer;
       font-size: 16px;
     }
-    img.logo {
-      display: block;
-      margin: auto;
-      max-width: 200px;
+    button:hover {
+      background-color: #c9303b;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <img src="https://cowboysac.com/wp-content/uploads/2025/06/color-logo-scaled-2-1.webp" alt="Cowboys AC Logo" class="logo">
-    <h2>Warranty Submission Form</h2>
+  <div class="form-container">
+    <div class="form-header">
+      <img src="logo.png" alt="Cowboys AC Logo">
+      <span><strong>Date:</strong> <input type="date" name="date"></span>
+    </div>
+
+    <h1>Warranty Registration & Claim Form</h1>
+
     <form id="warrantyForm">
-      <label>Employee Name <input type="text" name="employee"></label>
-      <label>Install Date <input type="date" name="installDate"></label>
-      <label>Job # <input type="text" name="jobNumber"></label>
-      <label>Customer Name <input type="text" name="customerName"></label>
-      <label>Customer Address <input type="text" name="customerAddress"></label>
-      <label>Model # <input type="text" name="model"></label>
-      <label>Serial # <input type="text" name="serial"></label>
-      <label>Brand <input type="text" name="brand"></label>
-      <label>Reason <textarea name="reason"></textarea></label>
-      <button type="button" onclick="generatePDF()">Submit & Generate PDF</button>
+      <label>Employee Name</label>
+      <input type="text" name="employeeName" required>
+
+      <label>Job Title</label>
+      <input type="text" name="jobTitle">
+
+      <label>Customer Name</label>
+      <input type="text" name="customerName" required>
+
+      <label>Customer Address</label>
+      <input type="text" name="customerAddress" required>
+
+      <label>City, State, Zip</label>
+      <input type="text" name="customerCityStateZip">
+
+      <label>Phone Number</label>
+      <input type="tel" name="customerPhone">
+
+      <label>Email</label>
+      <input type="email" name="customerEmail">
+
+      <label>Install Date</label>
+      <input type="date" name="installDate">
+
+      <label>Installer Name(s)</label>
+      <input type="text" name="installers">
+
+      <label>Invoice #</label>
+      <input type="text" name="invoice">
+
+      <label>Brand</label>
+      <input type="text" name="brand">
+
+      <label>Model Number</label>
+      <input type="text" name="modelNumber">
+
+      <label>Serial Number</label>
+      <input type="text" name="serialNumber">
+
+      <label>System Type</label>
+      <select name="systemType">
+        <option>Split AC</option>
+        <option>Heat Pump</option>
+        <option>Furnace</option>
+        <option>Air Handler</option>
+        <option>Coil</option>
+        <option>Mini Split</option>
+      </select>
+
+      <label>Size (Tonnage or BTU)</label>
+      <input type="text" name="size">
+
+      <label>Original Install Date (if different)</label>
+      <input type="date" name="originalInstallDate">
+
+      <label>Reason for Claim</label>
+      <textarea name="claimReason" rows="4"></textarea>
+
+      <label>Parts Being Replaced</label>
+      <textarea name="partsReplaced" rows="2"></textarea>
+
+      <label>Technician Notes</label>
+      <textarea name="techNotes" rows="3"></textarea>
+
+      <label>Upload Photo</label>
+      <input type="file" name="photoUpload" accept="image/*">
+
+      <label>Digital Signature</label>
+      <input type="text" name="signature" placeholder="Type name if signing digitally">
+
+      <button type="submit">Submit & Email to Warehouse</button>
     </form>
   </div>
 
   <script>
-    async function generatePDF() {
-      const { jsPDF } = window.jspdf;
-      const form = document.forms['warrantyForm'];
+    emailjs.init("YOUR_USER_ID"); // Replace with your EmailJS user ID
 
-      const doc = new jsPDF();
-      const logo = new Image();
-      logo.crossOrigin = "anonymous";
-      logo.src = 'https://cowboysac.com/wp-content/uploads/2025/06/color-logo-scaled-2-1.webp';
-
-      logo.onload = () => {
-        doc.addImage(logo, 'WEBP', 15, 10, 50, 20);
-        doc.setFontSize(16);
-        doc.text("Warranty Submission Form", 70, 25);
-        doc.setFontSize(12);
-
-        const entries = [
-          ['Employee Name', form.employee.value],
-          ['Install Date', form.installDate.value],
-          ['Job #', form.jobNumber.value],
-          ['Customer Name', form.customerName.value],
-          ['Customer Address', form.customerAddress.value],
-          ['Model #', form.model.value],
-          ['Serial #', form.serial.value],
-          ['Brand', form.brand.value],
-          ['Reason', form.reason.value],
-        ];
-
-        let y = 40;
-        entries.forEach(([label, value]) => {
-          doc.text(`${label}:`, 15, y);
-          doc.text(value || '-', 60, y);
-          y += 10;
-        });
-
-        doc.setFontSize(10);
-        doc.text("\u00A9 2025 Cowboys AC – Property of CowboysAC.com. Confidential – Intended solely for the recipient.", 15, 280);
-
-        doc.save(`Warranty-${form.jobNumber.value || 'Form'}.pdf`);
-
-        alert("PDF generated. Please email it manually to warehouse@cowboysac.com or set up auto-email script.");
-      };
-    }
+    document.getElementById("warrantyForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+      alert("Email sending and PDF logic will be implemented with EmailJS.");
+    });
   </script>
 </body>
 </html>
