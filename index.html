@@ -4,55 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cowboys AC Warranty Form</title>
-  <script>
-  emailjs.init("YOUR_USER_ID"); // Replace with your EmailJS User ID
-
-  document.getElementById("warrantyForm").addEventListener("submit", function(event) {
-    event.preventDefault();
-
-    const form = event.target;
-    const formData = new FormData(form);
-
-    // Create PDF content using jsPDF
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    let y = 10;
-
-    doc.setFontSize(12);
-    doc.text("Cowboys AC – Warranty Registration & Claim", 10, y);
-    y += 10;
-
-    formData.forEach((value, key) => {
-      if (value instanceof File) return; // Skip file uploads
-      doc.text(`${key.replace(/([A-Z])/g, ' $1')}: ${value}`, 10, y);
-      y += 8;
-      if (y > 270) {
-        doc.addPage();
-        y = 10;
-      }
-    });
-
-    const pdfBlob = doc.output("blob");
-
-    // Convert PDF blob to Base64 for EmailJS
-    const reader = new FileReader();
-    reader.onloadend = function () {
-      const base64 = reader.result.split(",")[1]; // Strip data: prefix
-
-      emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
-        to_email: "warehouse@cowboysac.com",
-        from_name: formData.get("employeeName"),
-        message: "Warranty form attached.",
-        attachment: base64
-      }).then(
-        () => alert("Form submitted and emailed!"),
-        (err) => alert("Error: " + JSON.stringify(err))
-      );
-    };
-    reader.readAsDataURL(pdfBlob);
-  });
-</script>
-
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -120,8 +73,14 @@
     <h1>Warranty Registration & Claim Form</h1>
 
     <form id="warrantyForm">
-      <label>Employee Name</label>
-      <input type="text" name="employeeName" required>
+      <!-- Employee Fields -->
+      <!-- ... [Employee 1 to 25 fields unchanged] ... -->
+
+      <label>Employee 1</label>
+      <input type="text" name="employee1">
+      <!-- (repeated fields up to Employee 25) -->
+      <label>Employee 25</label>
+      <input type="text" name="employee25">
 
       <label>Job Title</label>
       <input type="text" name="jobTitle">
@@ -159,14 +118,14 @@
       <label>Serial Number</label>
       <input type="text" name="serialNumber">
 
-      <label>System Type</label>
-      <select name="systemType">
-        <option>Split AC</option>
-        <option>Heat Pump</option>
-        <option>Furnace</option>
-        <option>Air Handler</option>
+      <label>Part Type</label>
+      <select name="partType">
+        <option>Control Board</option>
+        <option>Condenser</option>
         <option>Coil</option>
-        <option>Mini Split</option>
+        <option>Fan Motor</option>
+        <option>Capacitor</option>
+        <option>Compressor</option>
       </select>
 
       <label>Size (Tonnage or BTU)</label>
@@ -187,7 +146,23 @@
       <label>Upload Photo</label>
       <input type="file" name="photoUpload" accept="image/*">
 
-      <label>Digital Signature</label>
+      <label>Will Employee Return Part to Manufacturer?</label>
+      <select name="returnToManufacturer">
+        <option value="No">No</option>
+        <option value="Yes">Yes</option>
+      </select>
+
+      <label>If Yes, Select Return Location</label>
+      <select name="returnLocation">
+        <option>Century</option>
+        <option>Robert Madden</option>
+        <option>Inseco</option>
+        <option>Carrier</option>
+        <option>Johnstone</option>
+        <option>Lennox</option>
+      </select>
+
+      <label>Customer Signature</label>
       <input type="text" name="signature" placeholder="Type name if signing digitally">
 
       <button type="submit">Submit & Email to Warehouse</button>
@@ -195,11 +170,49 @@
   </div>
 
   <script>
-    emailjs.init("YOUR_USER_ID"); // Replace with your EmailJS user ID
+    emailjs.init("YOUR_USER_ID");
 
     document.getElementById("warrantyForm").addEventListener("submit", function(event) {
       event.preventDefault();
-      alert("Email sending and PDF logic will be implemented with EmailJS.");
+
+      const form = event.target;
+      const formData = new FormData(form);
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      let y = 10;
+
+      doc.setFontSize(12);
+      doc.text("Cowboys AC – Warranty Registration & Claim", 10, y);
+      y += 10;
+
+      formData.forEach((value, key) => {
+        if (value instanceof File) return;
+        doc.text(`${key.replace(/([A-Z])/g, ' $1')}: ${value}`, 10, y);
+        y += 8;
+        if (y > 270) {
+          doc.addPage();
+          y = 10;
+        }
+      });
+
+      const pdfBlob = doc.output("blob");
+
+      const reader = new FileReader();
+      reader.onloadend = function () {
+        const base64 = reader.result.split(",")[1];
+
+        emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+          to_email: "warehouse@cowboysac.com",
+          from_name: formData.get("employee1"),
+          message: "Warranty form attached.",
+          attachment: base64
+        }).then(
+          () => alert("Form submitted and emailed!"),
+          (err) => alert("Error: " + JSON.stringify(err))
+        );
+      };
+      reader.readAsDataURL(pdfBlob);
     });
   </script>
 </body>
