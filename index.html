@@ -4,8 +4,55 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cowboys AC Warranty Form</title>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+  emailjs.init("YOUR_USER_ID"); // Replace with your EmailJS User ID
+
+  document.getElementById("warrantyForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+
+    // Create PDF content using jsPDF
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    let y = 10;
+
+    doc.setFontSize(12);
+    doc.text("Cowboys AC – Warranty Registration & Claim", 10, y);
+    y += 10;
+
+    formData.forEach((value, key) => {
+      if (value instanceof File) return; // Skip file uploads
+      doc.text(`${key.replace(/([A-Z])/g, ' $1')}: ${value}`, 10, y);
+      y += 8;
+      if (y > 270) {
+        doc.addPage();
+        y = 10;
+      }
+    });
+
+    const pdfBlob = doc.output("blob");
+
+    // Convert PDF blob to Base64 for EmailJS
+    const reader = new FileReader();
+    reader.onloadend = function () {
+      const base64 = reader.result.split(",")[1]; // Strip data: prefix
+
+      emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+        to_email: "warehouse@cowboysac.com",
+        from_name: formData.get("employeeName"),
+        message: "Warranty form attached.",
+        attachment: base64
+      }).then(
+        () => alert("Form submitted and emailed!"),
+        (err) => alert("Error: " + JSON.stringify(err))
+      );
+    };
+    reader.readAsDataURL(pdfBlob);
+  });
+</script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
