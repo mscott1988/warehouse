@@ -61,6 +61,15 @@
     button:hover {
       background-color: #c9303b;
     }
+    .hidden {
+      display: none;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 14px;
+      color: #666;
+    }
   </style>
 </head>
 <body>
@@ -73,14 +82,35 @@
     <h1>Warranty Registration & Claim Form</h1>
 
     <form id="warrantyForm">
-      <!-- Employee Fields -->
-      <!-- ... [Employee 1 to 25 fields unchanged] ... -->
-
-      <label>Employee 1</label>
-      <input type="text" name="employee1">
-      <!-- (repeated fields up to Employee 25) -->
-      <label>Employee 25</label>
-      <input type="text" name="employee25">
+      <label>Employee</label>
+      <select name="employee" required>
+        <option value="">-- Select Employee --</option>
+        <option>Employee 1</option>
+        <option>Employee 2</option>
+        <option>Employee 3</option>
+        <option>Employee 4</option>
+        <option>Employee 5</option>
+        <option>Employee 6</option>
+        <option>Employee 7</option>
+        <option>Employee 8</option>
+        <option>Employee 9</option>
+        <option>Employee 10</option>
+        <option>Employee 11</option>
+        <option>Employee 12</option>
+        <option>Employee 13</option>
+        <option>Employee 14</option>
+        <option>Employee 15</option>
+        <option>Employee 16</option>
+        <option>Employee 17</option>
+        <option>Employee 18</option>
+        <option>Employee 19</option>
+        <option>Employee 20</option>
+        <option>Employee 21</option>
+        <option>Employee 22</option>
+        <option>Employee 23</option>
+        <option>Employee 24</option>
+        <option>Employee 25</option>
+      </select>
 
       <label>Job Title</label>
       <input type="text" name="jobTitle">
@@ -128,9 +158,6 @@
         <option>Compressor</option>
       </select>
 
-      <label>Size (Tonnage or BTU)</label>
-      <input type="text" name="size">
-
       <label>Original Install Date (if different)</label>
       <input type="date" name="originalInstallDate">
 
@@ -147,30 +174,38 @@
       <input type="file" name="photoUpload" accept="image/*">
 
       <label>Will Employee Return Part to Manufacturer?</label>
-      <select name="returnToManufacturer">
+      <select name="returnToManufacturer" id="returnToManufacturer">
         <option value="No">No</option>
         <option value="Yes">Yes</option>
       </select>
 
-      <label>If Yes, Select Return Location</label>
-      <select name="returnLocation">
-        <option>Century</option>
-        <option>Robert Madden</option>
-        <option>Inseco</option>
-        <option>Carrier</option>
-        <option>Johnstone</option>
-        <option>Lennox</option>
-      </select>
+      <div id="locationContainer" class="hidden">
+        <label>If Yes, Select Return Location</label>
+        <select name="returnLocation">
+          <option>Century</option>
+          <option>Robert Madden</option>
+          <option>Inseco</option>
+          <option>Carrier</option>
+          <option>Johnstone</option>
+          <option>Lennox</option>
+        </select>
+      </div>
 
       <label>Customer Signature</label>
       <input type="text" name="signature" placeholder="Type name if signing digitally">
 
       <button type="submit">Submit & Email to Warehouse</button>
     </form>
+    <div class="footer">&copy; 2025 Cowboys AC – All Rights Reserved</div>
   </div>
 
   <script>
     emailjs.init("YOUR_USER_ID");
+
+    document.getElementById("returnToManufacturer").addEventListener("change", function () {
+      const locationContainer = document.getElementById("locationContainer");
+      locationContainer.classList.toggle("hidden", this.value !== "Yes");
+    });
 
     document.getElementById("warrantyForm").addEventListener("submit", function(event) {
       event.preventDefault();
@@ -204,7 +239,7 @@
 
         emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
           to_email: "warehouse@cowboysac.com",
-          from_name: formData.get("employee1"),
+          from_name: formData.get("employee"),
           message: "Warranty form attached.",
           attachment: base64
         }).then(
@@ -217,3 +252,4 @@
   </script>
 </body>
 </html>
+
